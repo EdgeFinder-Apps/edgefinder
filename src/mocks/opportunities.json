@@ -1,0 +1,112 @@
+[
+  {
+    "id": "evt-001",
+    "title": "Will Bitcoin reach $200,000 by end of 2025?",
+    "category": "Crypto",
+    "endDateISO": "2025-12-31T23:59:59Z",
+    "polymarket": {
+      "marketId": "pm-btc-100k",
+      "yesPrice": 0.62,
+      "noPrice": 0.38,
+      "url": "https://polymarket.com/event/bitcoin-100k",
+      "liquidityUSD": 1250000
+    },
+    "kalshi": {
+      "ticker": "BTC-100K-DEC24",
+      "yesPrice": 0.58,
+      "noPrice": 0.42,
+      "url": "https://kalshi.com/markets/btc-100k",
+      "liquidityUSD": 850000
+    },
+    "spreadPercent": 3.2,
+    "hint": "BUY_YES_KALSHI_BUY_NO_PM"
+  },
+  {
+    "id": "evt-002",
+    "title": "Will the Fed cut rates in December 2025?",
+    "category": "Economics",
+    "endDateISO": "2025-12-15T23:59:59Z",
+    "polymarket": {
+      "marketId": "pm-fed-nov-cut",
+      "yesPrice": 0.72,
+      "noPrice": 0.28,
+      "url": "https://polymarket.com/event/fed-rate-cut-nov",
+      "liquidityUSD": 2100000
+    },
+    "kalshi": {
+      "ticker": "FED-DEC25-CUT",
+      "yesPrice": 0.78,
+      "noPrice": 0.22,
+      "url": "https://kalshi.com/markets/fed-cut",
+      "liquidityUSD": 1500000
+    },
+    "spreadPercent": 4.8,
+    "hint": "BUY_YES_PM_BUY_NO_KALSHI"
+  },
+  {
+    "id": "evt-003",
+    "title": "Will it snow in NYC on Christmas 2025?",
+    "category": "Weather",
+    "endDateISO": "2025-12-25T23:59:59Z",
+    "polymarket": {
+      "marketId": "pm-nyc-snow-xmas",
+      "yesPrice": 0.35,
+      "noPrice": 0.65,
+      "url": "https://polymarket.com/event/nyc-snow-christmas",
+      "liquidityUSD": 450000
+    },
+    "kalshi": {
+      "ticker": "NYC-SNOW-DEC25",
+      "yesPrice": 0.31,
+      "noPrice": 0.69,
+      "url": "https://kalshi.com/markets/nyc-snow",
+      "liquidityUSD": 320000
+    },
+    "spreadPercent": 2.9,
+    "hint": "BUY_YES_KALSHI_BUY_NO_PM"
+  },
+  {
+    "id": "evt-004",
+    "title": "Will SpaceX launch Starship to orbit in November 2025?",
+    "category": "Technology",
+    "endDateISO": "2025-11-30T23:59:59Z",
+    "polymarket": {
+      "marketId": "pm-starship-orbit",
+      "yesPrice": 0.88,
+      "noPrice": 0.12,
+      "url": "https://polymarket.com/event/starship-orbit-2024",
+      "liquidityUSD": 980000
+    },
+    "kalshi": {
+      "ticker": "STARSHIP-ORBIT-NOV25",
+      "yesPrice": 0.85,
+      "noPrice": 0.15,
+      "url": "https://kalshi.com/markets/starship",
+      "liquidityUSD": 720000
+    },
+    "spreadPercent": 2.1,
+    "hint": "BUY_YES_KALSHI_BUY_NO_PM"
+  },
+  {
+    "id": "evt-005",
+    "title": "Will OpenAI release GPT-5 by end of 2025?",
+    "category": "Technology",
+    "endDateISO": "2025-12-31T23:59:59Z",
+    "polymarket": {
+      "marketId": "pm-gpt5-2024",
+      "yesPrice": 0.45,
+      "noPrice": 0.55,
+      "url": "https://polymarket.com/event/gpt5-release",
+      "liquidityUSD": 1800000
+    },
+    "kalshi": {
+      "ticker": "GPT5-2025",
+      "yesPrice": 0.52,
+      "noPrice": 0.48,
+      "url": "https://kalshi.com/markets/gpt5",
+      "liquidityUSD": 1200000
+    },
+    "spreadPercent": 5.5,
+    "hint": "BUY_YES_PM_BUY_NO_KALSHI"
+  }
+]
