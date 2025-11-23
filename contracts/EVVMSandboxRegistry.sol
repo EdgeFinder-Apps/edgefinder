@@ -26,4 +26,39 @@ contract EVVMSandboxRegistry {
         address indexed executor,
         uint256 timestamp
     );
+    
+    function recordX402SandboxAction(
+        string memory opportunityId,
+        bytes32 actionHash,
+        uint256 asyncNonce,
+        address user,
+        string memory metadata
+    ) external returns (uint256) {
+        require(!usedAsyncNonces[user][asyncNonce], "Async nonce already used");
+        require(bytes(opportunityId).length > 0, "Invalid opportunity ID");
+        
+        usedAsyncNonces[user][asyncNonce] = true;
+        
+        uint256 intentId = nextIntentId++;
+        
+        sandboxActions[intentId] = SandboxAction({
+            opportunityId: opportunityId,
+            actionHash: actionHash,
+            asyncNonce: asyncNonce,
+            executor: msg.sender,
+            timestamp: block.timestamp,
+            metadata: metadata
+        });
+        
+        emit SandboxActionRecorded(
+            intentId,
+            opportunityId,
+            actionHash,
+            asyncNonce,
+            msg.sender,
+            block.timestamp
+        );
+        
+        return intentId;
+    }
 }
