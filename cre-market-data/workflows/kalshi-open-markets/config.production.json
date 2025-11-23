@@ -1,0 +1,13 @@
+{
+  "schedule": "30 */15 * * * *",
+  "maxMarkets": 10000,
+  "seriesPageLimit": 10,
+  "seriesOffset": 0,
+  "seriesLimit": 300,
+  "heartbeat": {
+    "enabled": true,
+    "chainSelectorName": "ethereum-testnet-sepolia-arbitrum-1",
+    "contractAddress": "0xE4d4c89d6B8CB420C3F98dD59bB74f05DA650429",
+    "gasLimit": "200000"
+  }
+}

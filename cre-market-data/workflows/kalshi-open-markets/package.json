@@ -1,0 +1,18 @@
+{
+  "name": "kalshi-open-markets-workflow",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "postinstall": "bunx cre-setup",
+    "cre-compile": "bunx cre-compile"
+  },
+  "dependencies": {
+    "@chainlink/cre-sdk": "^1.0.0",
+    "viem": "2.34.0",
+    "zod": "3.25.76"
+  },
+  "devDependencies": {
+    "@types/bun": "1.2.21"
+  }
+}
