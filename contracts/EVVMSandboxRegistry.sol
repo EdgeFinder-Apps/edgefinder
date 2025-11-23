@@ -17,4 +17,13 @@ contract EVVMSandboxRegistry {
     uint256 public nextIntentId;
     mapping(uint256 => SandboxAction) public sandboxActions;
     mapping(address => mapping(uint256 => bool)) public usedAsyncNonces;
+    
+    event SandboxActionRecorded(
+        uint256 indexed intentId,
+        string opportunityId,
+        bytes32 actionHash,
+        uint256 asyncNonce,
+        address indexed executor,
+        uint256 timestamp
+    );
 }
