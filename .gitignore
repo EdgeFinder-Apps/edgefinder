@@ -44,3 +44,8 @@ supabase/.temp
 
 # Debug scripts
 scripts/
+
+# Foundry/Forge artifacts
+contracts/cache/
+contracts/out/
+contracts/broadcast/
