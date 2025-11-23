@@ -61,4 +61,13 @@ contract EVVMSandboxRegistry {
         
         return intentId;
     }
+    
+    function getSandboxAction(uint256 intentId) external view returns (SandboxAction memory) {
+        require(intentId < nextIntentId, "Intent ID does not exist");
+        return sandboxActions[intentId];
+    }
+    
+    function isAsyncNonceUsed(address user, uint256 asyncNonce) external view returns (bool) {
+        return usedAsyncNonces[user][asyncNonce];
+    }
 }
