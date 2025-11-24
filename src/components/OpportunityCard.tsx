@@ -14,12 +14,14 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
     return null;
   }
   
+  const clampPrice = (value: number) => Math.max(0, Math.min(1, value))
+  
   const normalizedEvent = {
     ...event,
     polymarket: polymarket.yesPrice !== undefined ? polymarket : {
       marketId: polymarket.slug || '',
-      yesPrice: polymarket.last_trade_price ? parseFloat(polymarket.last_trade_price) / 100 : 0.5,
-      noPrice: polymarket.last_trade_price ? 1 - (parseFloat(polymarket.last_trade_price) / 100) : 0.5,
+      yesPrice: clampPrice(polymarket.last_trade_price ? parseFloat(polymarket.last_trade_price) : 0.5),
+      noPrice: clampPrice(polymarket.last_trade_price ? 1 - parseFloat(polymarket.last_trade_price) : 0.5),
       url: `https://polymarket.com/event/${polymarket.slug || ''}`,
       liquidityUSD: polymarket.volume ? parseFloat(polymarket.volume) : 0
     },

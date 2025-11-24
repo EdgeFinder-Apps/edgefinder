@@ -152,13 +152,15 @@ Deno.serve(async (req) => {
         
         return polyActive && kalshiActive;
       });
+      
+      const normalizePrice = (value: number) => Math.max(0, Math.min(1, value));
 
       const items = activeMatches.map((match: any) => {
         const polyMarket = match.polymarket_market;
         const kalshiMarket = match.kalshi_market;
         
-        const polyYesPrice = polyMarket?.last_trade_price ? parseFloat(polyMarket.last_trade_price) / 100 : 0.5;
-        const kalshiYesPrice = kalshiMarket?.yes_ask ? parseFloat(kalshiMarket.yes_ask) / 100 : 0.5;
+        const polyYesPrice = normalizePrice(polyMarket?.last_trade_price ? parseFloat(polyMarket.last_trade_price) : 0.5);
+        const kalshiYesPrice = normalizePrice(kalshiMarket?.yes_ask ? parseFloat(kalshiMarket.yes_ask) / 100 : 0.5);
         
         // Construct Polymarket URL
         let polyUrl = '';
@@ -230,13 +232,13 @@ Deno.serve(async (req) => {
             const polyMarket = match.polymarket_market;
             const kalshiMarket = match.kalshi_market;
             
-            const polyYesPrice = polyMarket?.last_trade_price ? parseFloat(polyMarket.last_trade_price) : 50;
-            const polyNoPrice = 100 - polyYesPrice;
-            const kalshiYesPrice = kalshiMarket?.yes_ask ? parseFloat(kalshiMarket.yes_ask) : 50;
-            const kalshiNoPrice = kalshiMarket?.no_bid ? parseFloat(kalshiMarket.no_bid) : 50;
+            const polyYesPrice = normalizePrice(polyMarket?.last_trade_price ? parseFloat(polyMarket.last_trade_price) : 0.5);
+            const polyNoPrice = 1 - polyYesPrice;
+            const kalshiYesPrice = normalizePrice(kalshiMarket?.yes_ask ? parseFloat(kalshiMarket.yes_ask) / 100 : 0.5);
+            const kalshiNoPrice = normalizePrice(kalshiMarket?.no_bid ? parseFloat(kalshiMarket.no_bid) / 100 : 0.5);
             
-            const option1 = (polyYesPrice / 100) + (kalshiNoPrice / 100);
-            const option2 = (kalshiYesPrice / 100) + (polyNoPrice / 100);
+            const option1 = polyYesPrice + kalshiNoPrice;
+            const option2 = kalshiYesPrice + polyNoPrice;
             const bestCost = Math.min(option1, option2);
             const edgePercent = bestCost < 1.0 ? (1.0 - bestCost) * 100 : 0;
             const edgeStrategy = option1 < option2 ? 'BUY_YES_PM_BUY_NO_KALSHI' : 'BUY_YES_KALSHI_BUY_NO_PM';
