@@ -1,6 +1,4 @@
-import { useState, useEffect } from 'react'
 import { MatchedEvent } from '../types'
-import { getOpportunityAnalytics, formatDuration, getEdgeQualityLabel, type EdgeAnalytics } from '../lib/amp'
 
 type OpportunityCardProps = {
   event: MatchedEvent
@@ -38,11 +36,6 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
   const displayEvent = normalizedEvent;
 
   const formatPrice = (price: number) => `${(price * 100).toFixed(1)}¢`
-  const formatLiquidity = (amount: number) => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(0)}K`
-    return `$${amount.toFixed(0)}`
-  }
 
   const calculateProfitMetrics = () => {
     if (!displayEvent?.polymarket?.yesPrice || !displayEvent?.kalshi?.yesPrice) {
@@ -82,27 +75,6 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
   }
 
   const profitMetrics = calculateProfitMetrics()
-  const [ampAnalytics, setAmpAnalytics] = useState<EdgeAnalytics | null>(null)
-  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false)
-  const [showAmpPanel, setShowAmpPanel] = useState(false)
-
-  useEffect(() => {
-    if (profitMetrics.isArbitrage && event.id) {
-      setIsLoadingAnalytics(true)
-      getOpportunityAnalytics(event.id, 24, 5.0)
-        .then(response => {
-          if (response.has_data && response.analytics) {
-            setAmpAnalytics(response.analytics)
-          }
-        })
-        .catch(err => {
-          console.error('Failed to fetch Amp analytics:', err)
-        })
-        .finally(() => {
-          setIsLoadingAnalytics(false)
-        })
-    }
-  }, [event.id, profitMetrics.isArbitrage])
 
   const endDate = new Date(displayEvent.endDateISO || new Date()).toLocaleDateString()
 
@@ -164,85 +136,6 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
         </div>
       )}
 
-      {profitMetrics.isArbitrage && ampAnalytics && (
-        <div className="bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/20 dark:to-purple-950/20 px-4 py-3 rounded-xl border-2 border-indigo-200 dark:border-indigo-800">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center space-x-2">
-              <svg className="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-              <span className="font-semibold text-indigo-800 dark:text-indigo-200">Historical Performance</span>
-            </div>
-            <button
-              onClick={() => setShowAmpPanel(!showAmpPanel)}
-              className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium"
-            >
-              {showAmpPanel ? 'Hide Details' : 'Show Details'}
-            </button>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div>
-              <div className="text-xs text-indigo-600 dark:text-indigo-400 mb-1">Duration</div>
-              <div className="font-bold text-indigo-900 dark:text-indigo-100">
-                {formatDuration(ampAnalytics.duration_minutes)}
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-indigo-600 dark:text-indigo-400 mb-1">Avg Edge</div>
-              <div className="font-bold text-indigo-900 dark:text-indigo-100">
-                {ampAnalytics.edge_avg.toFixed(1)}%
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-indigo-600 dark:text-indigo-400 mb-1">Range</div>
-              <div className="font-bold text-indigo-900 dark:text-indigo-100 text-sm">
-                {ampAnalytics.edge_min.toFixed(1)}% - {ampAnalytics.edge_max.toFixed(1)}%
-              </div>
-            </div>
-            <div>
-              <div className="text-xs text-indigo-600 dark:text-indigo-400 mb-1">Quality</div>
-              <div className={`font-bold text-sm ${getEdgeQualityLabel(ampAnalytics.edge_quality).color}`}>
-                {getEdgeQualityLabel(ampAnalytics.edge_quality).label}
-              </div>
-            </div>
-          </div>
-          {showAmpPanel && (
-            <div className="mt-3 pt-3 border-t border-indigo-200 dark:border-indigo-700 space-y-2">
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <div>
-                  <span className="text-indigo-600 dark:text-indigo-400">Snapshots:</span>
-                  <span className="ml-1 font-semibold text-indigo-900 dark:text-indigo-100">{ampAnalytics.snapshot_count}</span>
-                </div>
-                <div>
-                  <span className="text-indigo-600 dark:text-indigo-400">Above 5%:</span>
-                  <span className="ml-1 font-semibold text-indigo-900 dark:text-indigo-100">{ampAnalytics.samples_above_threshold}</span>
-                </div>
-                <div>
-                  <span className="text-indigo-600 dark:text-indigo-400">Persistent:</span>
-                  <span className="ml-1 font-semibold text-indigo-900 dark:text-indigo-100">{ampAnalytics.is_persistent ? 'Yes' : 'No'}</span>
-                </div>
-                <div>
-                  <span className="text-indigo-600 dark:text-indigo-400">Stable:</span>
-                  <span className="ml-1 font-semibold text-indigo-900 dark:text-indigo-100">{ampAnalytics.is_stable ? 'Yes' : 'No'}</span>
-                </div>
-              </div>
-            </div>
-          )}
-          <div className="mt-2 text-xs text-indigo-500 dark:text-indigo-400 italic">
-            Powered by Amp from The Graph
-          </div>
-        </div>
-      )}
-
-      {profitMetrics.isArbitrage && isLoadingAnalytics && (
-        <div className="bg-indigo-50 dark:bg-indigo-950/20 px-4 py-3 rounded-xl border border-indigo-200 dark:border-indigo-800">
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 border-2 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
-            <span className="text-sm text-indigo-700 dark:text-indigo-300">Loading edge analytics from Amp...</span>
-          </div>
-        </div>
-      )}
-
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-3 p-4 bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-950/20 dark:to-pink-950/20 rounded-xl border border-purple-200/50 dark:border-purple-800/50">
           <div className="flex items-center justify-between">
@@ -252,7 +145,6 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
               </div>
               <h4 className="font-bold text-base">Polymarket</h4>
             </div>
-            <span className="badge bg-white/80 dark:bg-gray-900/80 text-xs">{formatLiquidity(displayEvent.polymarket.liquidityUSD)}</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm px-4 py-3 rounded-lg border border-green-200 dark:border-green-800/50">
@@ -285,7 +177,6 @@ export function OpportunityCard({ event }: OpportunityCardProps) {
               </div>
               <h4 className="font-bold text-base">Kalshi</h4>
             </div>
-            <span className="badge bg-white/80 dark:bg-gray-900/80 text-xs">{formatLiquidity(displayEvent.kalshi.liquidityUSD)}</span>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-white/80 dark:bg-gray-900/40 backdrop-blur-sm px-4 py-3 rounded-lg border border-green-200 dark:border-green-800/50">
