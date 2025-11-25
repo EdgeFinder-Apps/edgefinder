@@ -1,6 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { Navigate } from 'react-router-dom'
 import { useWalletClient } from 'wagmi'
+import { getWalletClient } from '@wagmi/core'
+import { arbitrum } from 'wagmi/chains'
+import type { Address } from 'viem'
 import { useWallet } from '../context/WalletContext'
 import { storage } from '../lib/storage'
 import { startPayment, settlePayment, getPaymentStatus, getNextPipelineRun, type PaymentStatus } from '../lib/payments'
@@ -10,6 +13,7 @@ import { UserDataset, MatchedEvent } from '../types'
 import { Countdown } from '../components/Countdown'
 import { OpportunityCard } from '../components/OpportunityCard'
 import { getOpportunityAnalytics } from '../lib/amp'
+import { config as wagmiConfig } from '../lib/wagmi'
 
 type SortOption = 'endDateAsc' | 'endDateDesc' | 'roiAsc' | 'roiDesc' | 'ampScoreDesc'
 
@@ -158,6 +162,26 @@ export function Dashboard() {
     await handlePayment()
   }
 
+  const resolveWalletClient = async () => {
+    if (walletClient) {
+      return walletClient
+    }
+
+    if (!address) {
+      return null
+    }
+
+    try {
+      return await getWalletClient(wagmiConfig, {
+        account: address as Address,
+        chainId: arbitrum.id,
+      })
+    } catch (error) {
+      console.error('Failed to get wallet client', error)
+      return null
+    }
+  }
+
   const handlePayment = async () => {
     setShowPaymentModal(false)
     setIsLoading(true)
@@ -170,34 +194,37 @@ export function Dashboard() {
         return
       }
 
+      const connectedWalletClient = await resolveWalletClient()
+      if (!connectedWalletClient) {
+        showToast('Wallet client not available. Please reconnect your wallet and ensure it is unlocked.', 'error')
+        setIsLoading(false)
+        return
+      }
+
       showToast('Starting payment flow...', 'success')
       const requirements = await startPayment(address)
       
-      if (walletClient) {
-        showToast('Please sign the permit in your wallet...', 'success')
-        const permit = await createPermit(walletClient, requirements)
-        
-        showToast('Processing payment...', 'success')
-        const result = await settlePayment(address, requirements, permit)
-        
-        const newDataset = {
-          items: result.dataset.items,
-          fetchedAtISO: new Date().toISOString(),
-          nextAvailableAtISO: result.dataset.next_available_at,
-        }
-        
-        setDataset(newDataset)
-        storage.setUserDataset(newDataset)
-        setCanRefresh(false)
-        setTxHash(result.entitlement.tx_hash)
-        
-        const status = await getPaymentStatus(address)
-        setPaymentStatus(status)
-
-        showToast('Payment successful! Data refreshed.', 'success')
-      } else {
-        showToast('Wallet client not available. Please try reconnecting.', 'error')
+      showToast('Please sign the permit in your wallet...', 'success')
+      const permit = await createPermit(connectedWalletClient, requirements)
+      
+      showToast('Processing payment...', 'success')
+      const result = await settlePayment(address, requirements, permit)
+      
+      const newDataset = {
+        items: result.dataset.items,
+        fetchedAtISO: new Date().toISOString(),
+        nextAvailableAtISO: result.dataset.next_available_at,
       }
+      
+      setDataset(newDataset)
+      storage.setUserDataset(newDataset)
+      setCanRefresh(false)
+      setTxHash(result.entitlement.tx_hash)
+      
+      const status = await getPaymentStatus(address)
+      setPaymentStatus(status)
+
+      showToast('Payment successful! Data refreshed.', 'success')
     } catch (error: any) {
       console.error('Payment error:', error)
       showToast(error.message || 'Payment failed. Please try again.', 'error')
